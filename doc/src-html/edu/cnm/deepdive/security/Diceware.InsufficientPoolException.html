@@ -102,7 +102,7 @@
 <span class="sourceLineNo">094</span><a name="line.94">   */</a>
 <span class="sourceLineNo">095</span><a name="line.95">  public Random getRng() throws NoSuchAlgorithmException {</a>
 <span class="sourceLineNo">096</span><a name="line.96">    if (rng == null) {</a>
-<span class="sourceLineNo">097</span><a name="line.97">      rng = SecureRandom.getInstanceStrong();</a>
+<span class="sourceLineNo">097</span><a name="line.97">      rng = new SecureRandom();</a>
 <span class="sourceLineNo">098</span><a name="line.98">    }</a>
 <span class="sourceLineNo">099</span><a name="line.99">    return rng;</a>
 <span class="sourceLineNo">100</span><a name="line.100">  }</a>
@@ -121,7 +121,7 @@
 <span class="sourceLineNo">113</span><a name="line.113">   * &lt;code&gt;duplicatesAllowed&lt;/code&gt; parameter. If the provided word list has less words than the</a>
 <span class="sourceLineNo">114</span><a name="line.114">   * specified passphrase length and duplicates aren't allowed, an infinite loop will occur.</a>
 <span class="sourceLineNo">115</span><a name="line.115">   * </a>
-<span class="sourceLineNo">116</span><a name="line.116">   * @param length desired length of passphrase.</a>
+<span class="sourceLineNo">116</span><a name="line.116">   * @param length Desired length of passphrase.</a>
 <span class="sourceLineNo">117</span><a name="line.117">   * @param duplicatesAllowed If passphrase can have duplicate words.</a>
 <span class="sourceLineNo">118</span><a name="line.118">   * @return returns a &lt;code&gt;String[]&lt;/code&gt; that shows words selected for passphrase.</a>
 <span class="sourceLineNo">119</span><a name="line.119">   * @throws NoSuchAlgorithmException If lazy initialization is used can throw this exception.</a>
@@ -163,36 +163,66 @@
 <span class="sourceLineNo">155</span><a name="line.155">    return generate(length, true);</a>
 <span class="sourceLineNo">156</span><a name="line.156">  }</a>
 <span class="sourceLineNo">157</span><a name="line.157"></a>
-<span class="sourceLineNo">158</span><a name="line.158">  public String generate(int length, String delimiter)</a>
-<span class="sourceLineNo">159</span><a name="line.159">      throws InsufficientPoolException, NoSuchAlgorithmException, IllegalArgumentException {</a>
-<span class="sourceLineNo">160</span><a name="line.160">    return generate(length, delimiter, true);</a>
-<span class="sourceLineNo">161</span><a name="line.161">  }</a>
-<span class="sourceLineNo">162</span><a name="line.162"></a>
-<span class="sourceLineNo">163</span><a name="line.163">  public String generate(int length, String delimiter, boolean duplicatesAllowed)</a>
-<span class="sourceLineNo">164</span><a name="line.164">      throws InsufficientPoolException, NoSuchAlgorithmException, IllegalArgumentException {</a>
-<span class="sourceLineNo">165</span><a name="line.165">    String[] words = generate(length, duplicatesAllowed);</a>
-<span class="sourceLineNo">166</span><a name="line.166">    StringBuilder builder = new StringBuilder(words[0]);</a>
-<span class="sourceLineNo">167</span><a name="line.167">    for (int i = 1; i &lt; words.length; i++) {</a>
-<span class="sourceLineNo">168</span><a name="line.168">      builder.append(delimiter);</a>
-<span class="sourceLineNo">169</span><a name="line.169">      builder.append(words[i]);</a>
-<span class="sourceLineNo">170</span><a name="line.170">    }</a>
-<span class="sourceLineNo">171</span><a name="line.171">    return builder.toString();</a>
-<span class="sourceLineNo">172</span><a name="line.172">  }</a>
-<span class="sourceLineNo">173</span><a name="line.173"></a>
-<span class="sourceLineNo">174</span><a name="line.174">  private String generate() throws NoSuchAlgorithmException {</a>
-<span class="sourceLineNo">175</span><a name="line.175">    int index = getRng().nextInt(words.size());</a>
-<span class="sourceLineNo">176</span><a name="line.176">    return words.get(index);</a>
-<span class="sourceLineNo">177</span><a name="line.177">  }</a>
-<span class="sourceLineNo">178</span><a name="line.178"></a>
-<span class="sourceLineNo">179</span><a name="line.179">  public static class InsufficientPoolException extends IllegalArgumentException {</a>
-<span class="sourceLineNo">180</span><a name="line.180"></a>
-<span class="sourceLineNo">181</span><a name="line.181">    private InsufficientPoolException() {</a>
-<span class="sourceLineNo">182</span><a name="line.182"></a>
-<span class="sourceLineNo">183</span><a name="line.183">    }</a>
-<span class="sourceLineNo">184</span><a name="line.184"></a>
-<span class="sourceLineNo">185</span><a name="line.185">  }</a>
-<span class="sourceLineNo">186</span><a name="line.186"></a>
-<span class="sourceLineNo">187</span><a name="line.187">}</a>
+<span class="sourceLineNo">158</span><a name="line.158">  /**</a>
+<span class="sourceLineNo">159</span><a name="line.159">   * </a>
+<span class="sourceLineNo">160</span><a name="line.160">   * @param length Desired length of passphrase.</a>
+<span class="sourceLineNo">161</span><a name="line.161">   * @param delimiter Character that seperates the words in the passphrase.</a>
+<span class="sourceLineNo">162</span><a name="line.162">   * @return returns a &lt;code&gt;String&lt;/code&gt; that shows words selected for passphrase.</a>
+<span class="sourceLineNo">163</span><a name="line.163">   * @throws InsufficientPoolException If worldlist is too small.</a>
+<span class="sourceLineNo">164</span><a name="line.164">   * @throws NoSuchAlgorithmException If lazy initialization is used can throw this exception.</a>
+<span class="sourceLineNo">165</span><a name="line.165">   * @throws IllegalArgumentException If requested length is negative.</a>
+<span class="sourceLineNo">166</span><a name="line.166">   */</a>
+<span class="sourceLineNo">167</span><a name="line.167">  public String generate(int length, String delimiter)</a>
+<span class="sourceLineNo">168</span><a name="line.168">      throws InsufficientPoolException, NoSuchAlgorithmException, IllegalArgumentException {</a>
+<span class="sourceLineNo">169</span><a name="line.169">    return generate(length, delimiter, true);</a>
+<span class="sourceLineNo">170</span><a name="line.170">  }</a>
+<span class="sourceLineNo">171</span><a name="line.171"></a>
+<span class="sourceLineNo">172</span><a name="line.172">  /**</a>
+<span class="sourceLineNo">173</span><a name="line.173">   * </a>
+<span class="sourceLineNo">174</span><a name="line.174">   * @param length Desired length of passphrase.</a>
+<span class="sourceLineNo">175</span><a name="line.175">   * @param delimiter Character that seperates the words in the passphrase.</a>
+<span class="sourceLineNo">176</span><a name="line.176">   * @param duplicatesAllowed If passphrase can have duplicate words.</a>
+<span class="sourceLineNo">177</span><a name="line.177">   * @return returns a &lt;code&gt;String&lt;/code&gt; that shows words selected for passphrase.</a>
+<span class="sourceLineNo">178</span><a name="line.178">   * @throws InsufficientPoolException If worldlist is too small.</a>
+<span class="sourceLineNo">179</span><a name="line.179">   * @throws NoSuchAlgorithmException If lazy initialization is used can throw this exception.</a>
+<span class="sourceLineNo">180</span><a name="line.180">   * @throws IllegalArgumentException If requested length is negative.</a>
+<span class="sourceLineNo">181</span><a name="line.181">   */</a>
+<span class="sourceLineNo">182</span><a name="line.182">  public String generate(int length, String delimiter, boolean duplicatesAllowed)</a>
+<span class="sourceLineNo">183</span><a name="line.183">      throws InsufficientPoolException, NoSuchAlgorithmException, IllegalArgumentException {</a>
+<span class="sourceLineNo">184</span><a name="line.184">    String[] words = generate(length, duplicatesAllowed);</a>
+<span class="sourceLineNo">185</span><a name="line.185">    StringBuilder builder = new StringBuilder(words[0]);</a>
+<span class="sourceLineNo">186</span><a name="line.186">    for (int i = 1; i &lt; words.length; i++) {</a>
+<span class="sourceLineNo">187</span><a name="line.187">      builder.append(delimiter);</a>
+<span class="sourceLineNo">188</span><a name="line.188">      builder.append(words[i]);</a>
+<span class="sourceLineNo">189</span><a name="line.189">    }</a>
+<span class="sourceLineNo">190</span><a name="line.190">    return builder.toString();</a>
+<span class="sourceLineNo">191</span><a name="line.191">  }</a>
+<span class="sourceLineNo">192</span><a name="line.192"></a>
+<span class="sourceLineNo">193</span><a name="line.193">  /**</a>
+<span class="sourceLineNo">194</span><a name="line.194">   * </a>
+<span class="sourceLineNo">195</span><a name="line.195">   * @return Returns one word from the wordlist.</a>
+<span class="sourceLineNo">196</span><a name="line.196">   * @throws NoSuchAlgorithmException If lazy initialization is used can throw this exception.</a>
+<span class="sourceLineNo">197</span><a name="line.197">   */</a>
+<span class="sourceLineNo">198</span><a name="line.198">  private String generate() throws NoSuchAlgorithmException {</a>
+<span class="sourceLineNo">199</span><a name="line.199">    int index = getRng().nextInt(words.size());</a>
+<span class="sourceLineNo">200</span><a name="line.200">    return words.get(index);</a>
+<span class="sourceLineNo">201</span><a name="line.201">  }</a>
+<span class="sourceLineNo">202</span><a name="line.202"></a>
+<span class="sourceLineNo">203</span><a name="line.203">  /**</a>
+<span class="sourceLineNo">204</span><a name="line.204">   * An exception that occurs when there are not enough words to make a passphrase of requested length.</a>
+<span class="sourceLineNo">205</span><a name="line.205">   * </a>
+<span class="sourceLineNo">206</span><a name="line.206">   * @author jake_</a>
+<span class="sourceLineNo">207</span><a name="line.207">   *</a>
+<span class="sourceLineNo">208</span><a name="line.208">   */</a>
+<span class="sourceLineNo">209</span><a name="line.209">  public static class InsufficientPoolException extends IllegalArgumentException {</a>
+<span class="sourceLineNo">210</span><a name="line.210"></a>
+<span class="sourceLineNo">211</span><a name="line.211">    private InsufficientPoolException() {</a>
+<span class="sourceLineNo">212</span><a name="line.212"></a>
+<span class="sourceLineNo">213</span><a name="line.213">    }</a>
+<span class="sourceLineNo">214</span><a name="line.214"></a>
+<span class="sourceLineNo">215</span><a name="line.215">  }</a>
+<span class="sourceLineNo">216</span><a name="line.216"></a>
+<span class="sourceLineNo">217</span><a name="line.217">}</a>
 
 
 

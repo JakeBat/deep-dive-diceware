@@ -94,7 +94,7 @@ public class Diceware {
    */
   public Random getRng() throws NoSuchAlgorithmException {
     if (rng == null) {
-      rng = SecureRandom.getInstanceStrong();
+      rng = new SecureRandom();
     }
     return rng;
   }
@@ -113,7 +113,7 @@ public class Diceware {
    * <code>duplicatesAllowed</code> parameter. If the provided word list has less words than the
    * specified passphrase length and duplicates aren't allowed, an infinite loop will occur.
    * 
-   * @param length desired length of passphrase.
+   * @param length Desired length of passphrase.
    * @param duplicatesAllowed If passphrase can have duplicate words.
    * @return returns a <code>String[]</code> that shows words selected for passphrase.
    * @throws NoSuchAlgorithmException If lazy initialization is used can throw this exception.
@@ -155,11 +155,30 @@ public class Diceware {
     return generate(length, true);
   }
 
+  /**
+   * 
+   * @param length Desired length of passphrase.
+   * @param delimiter Character that seperates the words in the passphrase.
+   * @return returns a <code>String</code> that shows words selected for passphrase.
+   * @throws InsufficientPoolException If worldlist is too small.
+   * @throws NoSuchAlgorithmException If lazy initialization is used can throw this exception.
+   * @throws IllegalArgumentException If requested length is negative.
+   */
   public String generate(int length, String delimiter)
       throws InsufficientPoolException, NoSuchAlgorithmException, IllegalArgumentException {
     return generate(length, delimiter, true);
   }
 
+  /**
+   * 
+   * @param length Desired length of passphrase.
+   * @param delimiter Character that seperates the words in the passphrase.
+   * @param duplicatesAllowed If passphrase can have duplicate words.
+   * @return returns a <code>String</code> that shows words selected for passphrase.
+   * @throws InsufficientPoolException If worldlist is too small.
+   * @throws NoSuchAlgorithmException If lazy initialization is used can throw this exception.
+   * @throws IllegalArgumentException If requested length is negative.
+   */
   public String generate(int length, String delimiter, boolean duplicatesAllowed)
       throws InsufficientPoolException, NoSuchAlgorithmException, IllegalArgumentException {
     String[] words = generate(length, duplicatesAllowed);
@@ -171,11 +190,22 @@ public class Diceware {
     return builder.toString();
   }
 
+  /**
+   * 
+   * @return Returns one word from the wordlist.
+   * @throws NoSuchAlgorithmException If lazy initialization is used can throw this exception.
+   */
   private String generate() throws NoSuchAlgorithmException {
     int index = getRng().nextInt(words.size());
     return words.get(index);
   }
 
+  /**
+   * An exception that occurs when there are not enough words to make a passphrase of requested length.
+   * 
+   * @author jake_
+   *
+   */
   public static class InsufficientPoolException extends IllegalArgumentException {
 
     private InsufficientPoolException() {
